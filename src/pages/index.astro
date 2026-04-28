@@ -1,0 +1,61 @@
+---
+// 构建时执行的脚本块。这里定义本页要用的数据。
+const name = "LIYUAN";
+const role = "计算机科学本科生";
+const intro = "正在用 Astro + Cloudflare 搭建这个站点，从 Spring Boot/Vue3 转向现代 Serverless 栈。";
+const links = [
+  { label: "GitHub", url: "https://github.com/liyuan4LY" },
+  { label: "Email", url: "mailto:562596639ly@gmail.com" },
+];
+---
+
+<html lang="zh-CN">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{name} · 个人主页</title>
+	</head>
+	<body>
+		<main>
+			<h1>{name}</h1>
+			<p class="role">{role}</p>
+			<p>{intro}</p>
+
+			<h2>联系方式</h2>
+			<ul>
+				{links.map(link => (
+					<li>
+						<a href={link.url}>{link.label}</a>
+					</li>
+				))}
+			</ul>
+		</main>
+
+		<style>
+			main {
+				max-width: 640px;
+				margin: 4rem auto;
+				padding: 0 1rem;
+				font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+				line-height: 1.7;
+				color: #222;
+			}
+			h1 {
+				margin-bottom: 0.2em;
+			}
+			.role {
+				color: #888;
+				margin-top: 0;
+			}
+			a {
+				color: #2563eb;
+				text-decoration: none;
+			}
+			a:hover {
+				text-decoration: underline;
+			}
+		</style>
+	</body>
+</html>
