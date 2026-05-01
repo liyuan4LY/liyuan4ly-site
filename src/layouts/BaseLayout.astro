@@ -1,0 +1,135 @@
+---
+// ============================================================
+// BaseLayout.astro —— 全站基础布局（带背景图 + 毛玻璃 + 主题）
+// ============================================================
+// 职责：
+//   1. 引入 global.css（Tailwind + 主题变量）
+//   2. 提供 <html>/<head>/<body> 骨架
+//   3. 全屏背景图 + 主题色覆盖层
+//   4. 内容用毛玻璃卡片包裹，保证文字可读性
+//   5. 在 <head> 里内联一段脚本：从 localStorage 读主题立即应用
+//      （避免页面闪烁 = "Flash of Unstyled Theme" 现象）
+// ============================================================
+
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+
+// 默认描述兜底
+const { title, description = "LIYUAN 的个人主页" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+
+    {/*
+      关键脚本：放在 <head> 里同步执行（不是 defer / async）。
+      作用：在浏览器渲染 body 之前，先把 localStorage 里的主题
+      写到 <html data-theme="...">，避免页面先按默认主题渲染、再"闪一下"切换到正确主题。
+      注释里说的 FOUC（Flash of Unstyled Content）/ FOUT（Flash of Unstyled Theme）就是指这种现象。
+
+      is:inline = Astro 指令，告诉编译器"原样输出这段 script，不要打包"
+      （因为这段必须立即执行，不能等模块加载）
+    */}
+    {/*
+      防闪烁脚本（FOUT 防御）+ 首访跳转 welcome 选择页
+      逻辑：
+        1. 如果 localStorage 已有合法主题 → 立即应用，不跳转
+        2. 如果没存过（首访 / 清过浏览器数据）→ 跳到 /welcome 让用户选
+        3. 如果当前已经在 /welcome 页面 → 不重复跳（避免死循环）
+        4. 任何异常（如 localStorage 被禁用）→ 兜底设 sunset，不跳转
+      is:inline = 不打包，直接内联输出 HTML，保证在 body 渲染前同步执行
+    */}
+    <script is:inline>
+      (function () {
+        try {
+          const stored = localStorage.getItem('liyuan-theme');
+          if (stored === 'sunset' || stored === 'moonlit' || stored === 'dual') {
+            // 已有偏好 → 直接应用
+            document.documentElement.dataset.theme = stored;
+          } else if (window.location.pathname !== '/welcome') {
+            // 首访 + 不在 welcome 页 → 跳转去选择
+            window.location.replace('/welcome');
+          } else {
+            // 在 welcome 页且未选择 → 默认 dual 主题
+            document.documentElement.dataset.theme = 'dual';
+          }
+        } catch (e) {
+          // localStorage 被禁用 / 隐私模式 → 兜底
+          document.documentElement.dataset.theme = 'sunset';
+        }
+      })();
+    </script>
+  </head>
+
+  <body class="relative min-h-screen overflow-x-hidden font-sans text-[var(--text-color)]">
+
+    {/*
+      ① 背景图层（z-0，最底）
+      fixed inset-0 = 固定在视口、占满全屏（滚动时不动）
+    */}
+    <div
+      class="fixed inset-0 z-0 bg-cover bg-center"
+      style="background-image: url('/bg/entrance.webp');"
+    ></div>
+
+    {/*
+      ② 主题色蒙层（z-1，盖在背景上）
+      用 CSS 变量 --overlay-color / --overlay-opacity 控制
+      mix-blend-mode 让蒙层与图片融合，颜色更自然
+    */}
+    <div
+      class="fixed inset-0 z-[1] pointer-events-none transition-[background-color,opacity] duration-700"
+      style="background-color: var(--overlay-color); opacity: var(--overlay-opacity); mix-blend-mode: multiply;"
+    ></div>
+
+    {/*
+      ③ 内容层（z-10，最上）
+      relative + z-10 让它盖过背景和蒙层
+    */}
+    <div class="relative z-10 flex min-h-screen flex-col">
+
+      {/* --- 页头 --- */}
+      <header class="mx-auto flex w-full max-w-3xl items-center justify-between px-4 py-6 md:px-6">
+        <a
+          href="/"
+          class="text-lg font-bold tracking-widest text-white drop-shadow-md hover:opacity-80"
+        >
+          LIYUAN
+        </a>
+        <div class="flex items-center gap-4">
+          <Nav />
+          <ThemeToggle />
+        </div>
+      </header>
+
+      {/* --- 主体（毛玻璃卡片）---
+        backdrop-blur-xl = backdrop-filter: blur(24px) 毛玻璃效果
+        bg-[var(--card-bg)] = 用我们定义的主题变量做背景色（半透明，主题色调）
+        border = 边框，颜色用 --card-border 变量
+        rounded-2xl = 大圆角
+        shadow-2xl = 大阴影
+      */}
+      <main class="mx-auto w-full max-w-3xl flex-1 px-4 pb-12 md:px-6">
+        <div
+          class="rounded-2xl border p-6 shadow-2xl backdrop-blur-xl md:p-10"
+          style="background-color: var(--card-bg); border-color: var(--card-border);"
+        >
+          <slot />
+        </div>
+      </main>
+
+      {/* --- 页脚 --- */}
+      <footer class="mx-auto w-full max-w-3xl px-4 pb-6 text-center text-sm text-white/70 md:px-6">
+        <p>© 2026 LIYUAN · Built with Astro &amp; Cloudflare</p>
+      </footer>
+    </div>
+  </body>
+</html>

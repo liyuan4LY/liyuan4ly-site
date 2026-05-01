@@ -1,0 +1,34 @@
+---
+// ============================================================
+// Nav.astro —— 导航栏组件（Tailwind 重构版）
+// ============================================================
+// 与之前相比的变化：
+// - 全部样式改用 Tailwind class，不再写 <style>
+// - 颜色用主题变量，跟随 sunset/moonlit 切换
+// ============================================================
+
+const navItems = [
+  { label: "关于我", href: "/" },
+  { label: "项目", href: "/projects" },
+  { label: "博客", href: "/blog" },
+];
+---
+
+<nav>
+  <ul class="flex items-center gap-4 text-sm font-medium md:gap-6 md:text-base">
+    {navItems.map(item => (
+      <li>
+        {/*
+          color 用 var(--text-color)：跟随主题
+          hover 时变成 accent 色
+        */}
+        <a
+          href={item.href}
+          class="text-white/90 transition-colors hover:text-white"
+        >
+          {item.label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>

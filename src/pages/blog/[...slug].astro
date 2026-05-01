@@ -1,0 +1,79 @@
+---
+// ============================================================
+// pages/blog/[...slug].astro —— 博客文章详情页（Tailwind 重构版）
+// ============================================================
+// Markdown 元素样式现在统一在 global.css 的 .prose class 里。
+// ============================================================
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map(post => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+function formatDate(date: Date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+---
+
+<BaseLayout
+  title={`${post.data.title} · LIYUAN`}
+  description={post.data.description}
+>
+  <article>
+    <header
+      class="mb-8 border-b pb-6"
+      style="border-color: var(--card-border);"
+    >
+      <h1 class="mb-3 text-2xl font-bold leading-tight text-white md:text-3xl">
+        {post.data.title}
+      </h1>
+      <div class="flex flex-wrap items-center gap-3 text-sm text-white/60">
+        <time datetime={post.data.pubDate.toISOString()}>
+          {formatDate(post.data.pubDate)}
+        </time>
+        {post.data.tags.length > 0 && (
+          <ul class="flex flex-wrap gap-2">
+            {post.data.tags.map(tag => (
+              <li
+                class="rounded px-2 py-1 text-xs"
+                style="background-color: rgba(255,255,255,0.12); color: var(--text-muted);"
+              >
+                {tag}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </header>
+
+    {/* Markdown 渲染区域：用 .prose class 应用全局定义的 Markdown 样式 */}
+    <div class="prose text-white/90">
+      <Content />
+    </div>
+
+    <footer
+      class="mt-12 border-t pt-6"
+      style="border-color: var(--card-border);"
+    >
+      <a
+        href="/blog"
+        class="text-sm underline-offset-4 hover:underline"
+        style="color: var(--link-color);"
+      >
+        ← 返回文章列表
+      </a>
+    </footer>
+  </article>
+</BaseLayout>

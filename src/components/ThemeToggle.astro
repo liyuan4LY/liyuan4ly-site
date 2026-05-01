@@ -1,0 +1,43 @@
+---
+// ============================================================
+// ThemeToggle.astro —— 主题切换按钮
+// ============================================================
+// 显示当前主题的图标（夕阳模式 ☀ / 月夜模式 ☾），
+// 鼠标悬停时浮出 title 提示"点击切换到另一种主题"。
+// 点击后在 sunset / moonlit 间循环切换。
+// ============================================================
+---
+
+<button
+  type="button"
+  id="theme-toggle"
+  aria-label="切换主题"
+  title="当前主题"
+  class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-white/10 text-xl text-white backdrop-blur-md transition-all hover:scale-110 hover:bg-white/20"
+>
+  {/*
+    两个 span 同时存在，CSS 控制只显示当前主题对应的那个：
+    - data-theme="sunset"  → 显示 ☀
+    - data-theme="moonlit" → 显示 ☾
+    - data-theme="dual"    → 显示 ☀（兜底）
+  */}
+  <span class="icon-sunset hidden">☀</span>
+  <span class="icon-moonlit hidden">☾</span>
+</button>
+
+<style>
+  /* 显示当前主题对应的图标 */
+  :global([data-theme="sunset"]) .icon-sunset { display: inline; }
+  :global([data-theme="moonlit"]) .icon-moonlit { display: inline; }
+  /* dual（入场图状态）默认显示太阳图标 */
+  :global([data-theme="dual"]) .icon-sunset { display: inline; }
+</style>
+
+<script>
+  import { toggleTheme } from '../lib/theme';
+
+  const btn = document.getElementById('theme-toggle');
+  btn?.addEventListener('click', () => {
+    toggleTheme();
+  });
+</script>

@@ -1,61 +1,39 @@
 ---
-// 构建时执行的脚本块。这里定义本页要用的数据。
+// ============================================================
+// index.astro —— 首页（关于我，Tailwind 重构版）
+// ============================================================
+// 内容不变，全部样式改用 Tailwind class。
+// 配色靠主题变量自动切换，本文件不写颜色硬编码。
+// ============================================================
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+
 const name = "LIYUAN";
 const role = "计算机科学本科生";
-const intro = "正在用 Astro + Cloudflare 搭建本站点，从 Spring Boot/Vue3 转向现代 Serverless 栈。";
+const intro = "正在用 Astro + Tailwind CSS + Cloudflare 搭建本站点，从 Spring Boot/Vue3 转向现代 Serverless 栈。";
 const links = [
   { label: "GitHub", url: "https://github.com/liyuan4LY" },
   { label: "Email", url: "mailto:562596639ly@gmail.com" },
 ];
 ---
 
-<html lang="zh-CN">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{name} · 个人主页</title>
-	</head>
-	<body>
-		<main>
-			<h1>{name}</h1>
-			<p class="role">{role}</p>
-			<p>{intro}</p>
+<BaseLayout title="LIYUAN · 个人主页" description="LIYUAN 的个人主页，记录学习、项目与博客。">
+  <h1 class="mb-2 text-3xl font-bold text-white md:text-4xl">{name}</h1>
+  <p class="mb-6 text-base text-white/70">{role}</p>
+  <p class="text-base leading-relaxed text-white/90 md:text-lg">{intro}</p>
 
-			<h2>联系方式</h2>
-			<ul>
-				{links.map(link => (
-					<li>
-						<a href={link.url}>{link.label}</a>
-					</li>
-				))}
-			</ul>
-		</main>
-
-		<style>
-			main {
-				max-width: 640px;
-				margin: 4rem auto;
-				padding: 0 1rem;
-				font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-				line-height: 1.7;
-				color: #222;
-			}
-			h1 {
-				margin-bottom: 0.2em;
-			}
-			.role {
-				color: #888;
-				margin-top: 0;
-			}
-			a {
-				color: #2563eb;
-				text-decoration: none;
-			}
-			a:hover {
-				text-decoration: underline;
-			}
-		</style>
-	</body>
-</html>
+  <h2 class="mt-10 mb-4 text-xl font-semibold text-white md:text-2xl">联系方式</h2>
+  <ul class="flex flex-col gap-2">
+    {links.map(link => (
+      <li>
+        <a
+          href={link.url}
+          class="text-white/90 underline-offset-4 hover:underline"
+          style="color: var(--link-color);"
+        >
+          {link.label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</BaseLayout>

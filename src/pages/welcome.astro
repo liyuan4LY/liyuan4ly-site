@@ -1,0 +1,93 @@
+---
+// ============================================================
+// welcome.astro —— 入场选择页
+// ============================================================
+// 内容：
+//   结构：两个绝对定位的 button 铺满左右两半全屏，
+//   header / footer 用 absolute + pointer-events-none 浮在按钮上层，
+//   鼠标可以穿透 header/footer 触达底层 button → 蒙层覆盖整个半屏。
+// ============================================================
+
+import '../styles/global.css';
+---
+
+<!doctype html>
+<html lang="zh-CN" data-theme="dual">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content="选择 LIYUAN 网站的展示风格" />
+    <title>选择风格 · LIYUAN</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body class="m-0 h-screen w-screen overflow-hidden font-sans">
+
+    {/* ① 背景层（z-0，最底） */}
+    <div
+      class="absolute inset-0 z-0 bg-cover bg-center"
+      style="background-image: url('/bg/entrance.webp');"
+    ></div>
+
+    {/* ② 两个全屏半边按钮（z-10）
+        - absolute 定位：left-0 占满左半、right-0 占满右半
+        - top-0 bottom-0：高度铺满整个屏幕
+        - hover 时整个半屏蒙暖色 / 冷色
+    */}
+    <button
+      type="button"
+      data-choice="sunset"
+      class="group absolute top-0 bottom-0 left-0 z-10 w-1/2 cursor-pointer border-0 bg-transparent transition-all duration-500 hover:bg-orange-500/15"
+      aria-label="选择夕阳模式"
+    >
+      {/* 图标和文字：放在按钮中下部分，hover 时浮现 */}
+      <div class="pointer-events-none absolute inset-x-0 bottom-24 flex flex-col items-center gap-2 text-white opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+        <span class="text-6xl drop-shadow-lg">☀</span>
+        <span class="text-2xl font-semibold drop-shadow-lg">夕阳</span>
+      </div>
+    </button>
+
+    <button
+      type="button"
+      data-choice="moonlit"
+      class="group absolute top-0 right-0 bottom-0 z-10 w-1/2 cursor-pointer border-0 bg-transparent transition-all duration-500 hover:bg-indigo-500/15"
+      aria-label="选择月夜模式"
+    >
+      <div class="pointer-events-none absolute inset-x-0 bottom-24 flex flex-col items-center gap-2 text-white opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+        <span class="text-6xl drop-shadow-lg">☾</span>
+        <span class="text-2xl font-semibold drop-shadow-lg">月夜</span>
+      </div>
+    </button>
+
+    {/* ③ 顶部标题层（z-20，浮在按钮之上）
+        pointer-events-none：让鼠标点击穿透到下层按钮
+        这样标题区域虽然显示在按钮之上，但 hover/click 都被按钮接管
+    */}
+    <header class="pointer-events-none absolute inset-x-0 top-0 z-20 px-6 pt-12 pb-6 text-center text-white drop-shadow-lg md:pt-16">
+      <h1 class="text-3xl font-bold tracking-wide md:text-5xl">
+        欢迎来到 LIYUAN
+      </h1>
+      <p class="mt-3 text-base text-white/85 md:text-lg">
+        选择你的风格 · 点击左侧进入夕阳，点击右侧进入月夜
+      </p>
+    </header>
+
+    {/* ④ 底部提示层（z-20） */}
+    <footer class="pointer-events-none absolute inset-x-0 bottom-0 z-20 pb-6 text-center text-s text-white/70">
+      你可以随时在右上角切换风格
+    </footer>
+
+    {/* ⑤ 客户端脚本：点击 → 存主题 → 跳首页 */}
+    <script>
+      import { setTheme, type Theme } from '../lib/theme';
+
+      const buttons = document.querySelectorAll<HTMLButtonElement>('[data-choice]');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const choice = btn.dataset.choice as Theme;
+          setTheme(choice);
+          window.location.href = '/';
+        });
+      });
+    </script>
+  </body>
+</html>

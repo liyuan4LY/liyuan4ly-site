@@ -1,0 +1,69 @@
+---
+// ============================================================
+// projects.astro —— 项目展示页（Tailwind 重构版）
+// ============================================================
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import projects from '../data/projects.json';
+
+const sortedProjects = projects.slice().sort((a, b) => b.year - a.year);
+---
+
+<BaseLayout
+  title="项目 · LIYUAN"
+  description="LIYUAN 的项目作品集，包含个人网站、Telegram 聊天机器人等"
+>
+  <h1 class="mb-2 text-3xl font-bold text-white md:text-4xl">项目</h1>
+  <p class="mb-8 text-base text-white/70">这里列出我做过和正在做的项目。点击标题可跳转到源码仓库。</p>
+
+  <section class="flex flex-col gap-6">
+    {sortedProjects.map(p => (
+      <article
+        class="rounded-xl border p-5 backdrop-blur-md transition-all hover:scale-[1.01]"
+        style="background-color: rgba(255,255,255,0.05); border-color: var(--card-border);"
+      >
+        <header class="mb-2 flex items-baseline justify-between gap-3">
+          <h2 class="text-xl font-semibold md:text-2xl">
+            <a
+              href={p.url}
+              target="_blank"
+              rel="noopener"
+              class="text-white transition-colors hover:opacity-80"
+              style="color: var(--text-color);"
+            >
+              {p.name}
+            </a>
+          </h2>
+          <span class="text-sm text-white/60">{p.year}</span>
+        </header>
+
+        <p class="mb-3 text-white/85">{p.description}</p>
+
+        <ul class="mb-3 flex flex-wrap gap-2">
+          {p.tags.map(tag => (
+            <li
+              class="rounded px-2 py-1 text-xs"
+              style="background-color: rgba(255,255,255,0.12); color: var(--text-muted);"
+            >
+              {tag}
+            </li>
+          ))}
+        </ul>
+
+        {p.demo && (
+          <p class="m-0">
+            <a
+              href={p.demo}
+              target="_blank"
+              rel="noopener"
+              class="text-sm underline-offset-4 hover:underline"
+              style="color: var(--link-color);"
+            >
+              访问在线版本 →
+            </a>
+          </p>
+        )}
+      </article>
+    ))}
+  </section>
+</BaseLayout>

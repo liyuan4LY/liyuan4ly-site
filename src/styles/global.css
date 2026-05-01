@@ -1,0 +1,181 @@
+/* ============================================================
+   global.css —— 全站基础样式 + 主题系统
+   ============================================================
+   作用：
+   1. 引入 Tailwind v4（一行 @import 搞定）
+   2. 通过 @theme 块向 Tailwind 注册自定义颜色和字体
+   3. 用 CSS 变量定义两套主题（夕阳 / 月夜）
+   4. 通过 [data-theme="xxx"] 选择器切换变量值
+   引入位置：BaseLayout.astro 的 frontmatter 里 import 一次即可
+   ============================================================ */
+
+
+/* ---- 1) 引入 Tailwind ---- */
+@import "tailwindcss";
+
+
+/* ---- 2) 引入字体（Google Fonts）----
+   Inter：英文字体，干净现代，Vercel/Linear 在用
+   Noto Sans SC：思源黑体简体中文版，Google 出的，免费
+   注意：@import 必须放在 CSS 文件最顶部（紧跟 @import "tailwindcss"）
+*/
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+
+
+/* ---- 3) Tailwind v4 主题配置 ----
+   @theme 块里定义的变量，Tailwind 会自动生成对应的 utility class。
+   例如 --color-sunset-500 → 可以在 HTML 里写 bg-sunset-500、text-sunset-500、border-sunset-500
+*/
+@theme {
+  /* 字体栈：第一选择 Inter（英文），第二选择 Noto Sans SC（中文兜底），最后系统字体 */
+  --font-sans: "Inter", "Noto Sans SC", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* 夕阳调色板（暖色系） */
+  --color-sunset-50:  #fff7ed;
+  --color-sunset-100: #ffedd5;
+  --color-sunset-200: #fed7aa;
+  --color-sunset-300: #fdba74;
+  --color-sunset-400: #fb923c;
+  --color-sunset-500: #f97316;   /* 主色 */
+  --color-sunset-600: #ea580c;
+  --color-sunset-700: #c2410c;
+  --color-sunset-800: #9a3412;
+  --color-sunset-900: #7c2d12;
+
+  /* 月夜调色板（冷色系，紫蓝调） */
+  --color-moonlit-50:  #eef2ff;
+  --color-moonlit-100: #e0e7ff;
+  --color-moonlit-200: #c7d2fe;
+  --color-moonlit-300: #a5b4fc;
+  --color-moonlit-400: #818cf8;
+  --color-moonlit-500: #6366f1;   /* 主色 */
+  --color-moonlit-600: #4f46e5;
+  --color-moonlit-700: #4338ca;
+  --color-moonlit-800: #3730a3;
+  --color-moonlit-900: #312e81;
+}
+
+
+/* ---- 4) 主题变量（runtime 切换的实际值）----
+   这套变量与 @theme 不同：@theme 是给 Tailwind 用的（生成 class），
+   下面这些是给我们自己的 CSS 用的（描述当前主题下的语义化颜色）。
+   切换主题 = 改 <html data-theme="xxx"> → 这些变量值改变 → 用到它们的元素自动变。
+
+   :root = 默认值（双主题入场图，不带任何主题色加成）
+*/
+:root {
+  /* 文字主色 */
+  --text-color: #f8fafc;
+  --text-muted: #cbd5e1;
+  /* 链接色 */
+  --link-color: #a5b4fc;
+  /* 卡片：毛玻璃背景（半透明白） */
+  --card-bg: rgba(15, 23, 42, 0.45);
+  --card-border: rgba(255, 255, 255, 0.18);
+  /* 主题强调色（按钮、tag、强调元素） */
+  --accent: #a5b4fc;
+  /* 主题覆盖层颜色（盖在背景图上的整体色调蒙层） */
+  --overlay-color: transparent;
+  --overlay-opacity: 0;
+}
+
+/* 夕阳主题 */
+[data-theme="sunset"] {
+  --text-color: #fff7ed;
+  --text-muted: #fed7aa;
+  --link-color: #fdba74;
+  --card-bg: rgba(124, 45, 18, 0.35);    /* 暖棕半透明 */
+  --card-border: rgba(253, 186, 116, 0.25);
+  --accent: #fb923c;
+  --overlay-color: #ea580c;
+  --overlay-opacity: 0.18;                /* 整图加一层暖色蒙层 */
+}
+
+/* 月夜主题 */
+[data-theme="moonlit"] {
+  --text-color: #eef2ff;
+  --text-muted: #c7d2fe;
+  --link-color: #a5b4fc;
+  --card-bg: rgba(30, 27, 75, 0.45);     /* 深紫半透明 */
+  --card-border: rgba(165, 180, 252, 0.25);
+  --accent: #a5b4fc;
+  --overlay-color: #4338ca;
+  --overlay-opacity: 0.22;                /* 整图加一层冷紫蒙层 */
+}
+
+
+/* ---- 5) 基础排版 ----
+   Tailwind 默认会重置一些样式。这里只补几条全局规则。
+*/
+html {
+  /* 平滑滚动（点锚点链接时） */
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--text-color);
+  /* 主题切换时，颜色过渡 600ms，丝滑感来源 */
+  transition: color 600ms ease;
+}
+
+/* 链接默认色随主题变 */
+a {
+  color: var(--link-color);
+  transition: color 200ms ease;
+}
+
+
+/* ---- 6) Markdown 文章正文样式（迁移自 [...slug].astro）----
+   博客详情页的 Markdown 渲染元素全是裸标签，这里统一定义。
+   作用域用 .prose 限制（不加全局，避免乱入）。
+*/
+.prose h2 { margin-top: 2.5rem; font-size: 1.4rem; font-weight: 600; }
+.prose h3 { margin-top: 2rem;   font-size: 1.15rem; font-weight: 600; }
+.prose p  { margin: 1rem 0; }
+.prose a  { color: var(--link-color); }
+.prose a:hover { text-decoration: underline; }
+.prose code {
+  background: rgba(255, 255, 255, 0.12);
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.92em;
+  font-family: ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
+}
+.prose pre {
+  background: rgba(15, 23, 42, 0.7);
+  color: #f1f5f9;
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 1.2rem 0;
+}
+.prose pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+.prose blockquote {
+  border-left: 3px solid var(--accent);
+  padding: 0.5rem 1rem;
+  margin: 1rem 0;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+}
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.95rem;
+}
+.prose th,
+.prose td {
+  border: 1px solid var(--card-border);
+  padding: 0.5rem 0.8rem;
+  text-align: left;
+}
+.prose th { background: rgba(255, 255, 255, 0.08); }
+.prose ul, .prose ol { padding-left: 1.5rem; margin: 1rem 0; }
+.prose li { margin: 0.3rem 0; }

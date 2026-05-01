@@ -1,0 +1,34 @@
+[
+  {
+    "name": "liyuan4ly-site",
+    "description": "本站点。Astro + Cloudflare Pages 搭建的个人网站，包含关于我、项目展示、博客模块。",
+    "tags": ["Astro", "TypeScript", "Cloudflare Pages"],
+    "url": "https://github.com/liyuan4LY/liyuan4ly-site",
+    "demo": "https://liyuan4ly.com",
+    "year": 2026
+  },
+  {
+    "name": "liyuan4ly-bot",
+    "description": "Telegram 聊天机器人。Cloudflare Worker + Claude API + Cron Triggers，每天早晚主动发起对话，支持双向回复（开发中）。",
+    "tags": ["Cloudflare Worker", "TypeScript", "Claude API", "Telegram Bot"],
+    "url": "https://github.com/liyuan4LY/liyuan4ly-bot",
+    "demo": null,
+    "year": 2026
+  },
+  {
+    "name": "bank-training-system",
+    "description": "银行培训系统。基于 Spring Boot 和 Vue3 开发，用于员工培训，本科毕设。",
+    "tags": ["Spring Boot", "Vue3", "MySQL", "Redis"],
+    "url": "https://github.com/liyuan4LY/bank-training-system",
+    "demo": null,
+    "year": 2026
+  },
+  {
+    "name": "xiaozhan-toefl-unlock",
+    "description": "小站托福解锁。Tampermonkey 油猴脚本，解锁小站托福 top.zhan.com 全部 TPO 试题并屏蔽广告。",
+    "tags": ["Tampermonkey", "JavaScript"],
+    "url": "https://github.com/liyuan4LY/xiaozhan-toefl-unlock",
+    "demo": null,
+    "year": 2025
+  }
+]
